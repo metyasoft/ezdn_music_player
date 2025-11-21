@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EZDN Player - Simple Music Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Hiragino Sans', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav a {
+            margin-left: 30px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav a:hover {
+            color: #667eea;
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: relative;
+        }
+
+        .language-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+
+        .language-btn:hover {
+            background: #5568d3;
+        }
+
+        .language-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            min-width: 120px;
+        }
+
+        .language-dropdown.active {
+            display: block;
+        }
+
+        .language-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+
+        .language-option:hover {
+            background: #f0f4ff;
+        }
+
+        .language-option.selected {
+            background: #e0e7ff;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .hero p {
+            font-size: 24px;
+            margin-bottom: 10px;
+            opacity: 0.95;
+        }
+
+        .hero .subtitle {
+            font-size: 18px;
+            opacity: 0.85;
+            margin-bottom: 40px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Content Section */
+        .content {
+            background: white;
+            border-radius: 30px 30px 0 0;
+            margin-top: -30px;
+            padding: 60px 20px;
+        }
+
+        .section {
+            margin-bottom: 80px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #667eea;
+        }
+
+        /* Screenshots */
+        .screenshots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .screenshot-card {
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .screenshot-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .screenshot-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+
+        .screenshot-card h3 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .screenshot-card p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Features */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        /* FAQ */
+        .faq-item {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+
+        .faq-item:hover {
+            background: #e9ecef;
+        }
+
+        .faq-question {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .faq-answer {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .contact {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 20px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            .screenshots {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">🎵 EZDN Player</div>
+                <div class="header-right">
+                    <nav class="nav">
+                        <a href="#features" data-i18n="nav_features">기능</a>
+                        <a href="#screenshots" data-i18n="nav_screenshots">스크린샷</a>
+                        <a href="#faq" data-i18n="nav_faq">FAQ</a>
+                        <a href="privacy.html" data-i18n="nav_privacy">개인정보처리방침</a>
+                    </nav>
+                    <div class="language-selector">
+                        <button class="language-btn" onclick="toggleLanguageMenu()">
+                            <span id="current-lang">🇰🇷 한국어</span>
+                            <span>▼</span>
+                        </button>
+                        <div class="language-dropdown" id="language-dropdown">
+                            <div class="language-option selected" onclick="changeLanguage('ko')">🇰🇷 한국어</div>
+                            <div class="language-option" onclick="changeLanguage('en')">🇺🇸 English</div>
+                            <div class="language-option" onclick="changeLanguage('ja')">🇯🇵 日本語</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1 data-i18n="hero_title_1">불필요한 기능은 빼고<br>음악만 남겼습니다</h1>
+            <p data-i18n="hero_title_2">Nothing Extra. Only Music</p>
+            <p class="subtitle" data-i18n="hero_subtitle">심플하지만 강력한 음악 플레이어를 경험하세요</p>
+            <a href="#" class="download-btn" data-i18n="download_btn">App Store에서 다운로드</a>
+        </div>
+    </section>
+
+    <div class="content">
+        <div class="container">
+            <!-- Screenshots Section -->
+            <section id="screenshots" class="section">
+                <h2 class="section-title" data-i18n="screenshots_title">앱 둘러보기</h2>
+                <div class="screenshots">
+                    <div class="screenshot-card">
+                        <img src="./EZDN%20Player_01.png" alt="EZDN Player">
+                        <h3 data-i18n="screenshot1_title">깔끔한 인터페이스</h3>
+                        <p data-i18n="screenshot1_desc">불필요한 기능 없이 음악에만 집중할 수 있는 미니멀 디자인</p>
+                    </div>
+                    <div class="screenshot-card">
+                        <img src="./EZDN%20Player_02.png" alt="EZDN Player">
+                        <h3 data-i18n="screenshot2_title">원터치 반입</h3>
+                        <p data-i18n="screenshot2_desc">다운로드 폴더에서 바로 음악을 가져오는 혁신적인 기능</p>
+                    </div>
+                    <div class="screenshot-card">
+                        <img src="./EZDN%20Player_03.png" alt="EZDN Player">
+                        <h3 data-i18n="screenshot3_title">자유로운 커스터마이징</h3>
+                        <p data-i18n="screenshot3_desc">복사한 이미지를 롱프레스로 앨범 아트에 바로 적용</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section id="features" class="section">
+                <h2 class="section-title" data-i18n="features_title">핵심 기능</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">📁</div>
+                        <h3 data-i18n="feature1_title">다운로드 폴더 직접 접근</h3>
+                        <p data-i18n="feature1_desc">모바일 브라우저에서 다운받은 MP3를 원터치로 즉시 반입</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3 data-i18n="feature2_title">앨범 커스터마이징</h3>
+                        <p data-i18n="feature2_desc">복사한 이미지를 롱프레스로 앨범 아트에 간편하게 적용</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">✏️</div>
+                        <h3 data-i18n="feature3_title">메타데이터 편집</h3>
+                        <p data-i18n="feature3_desc">제목, 아티스트명을 복사-붙여넣기로 빠르게 수정</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3 data-i18n="feature4_title">빠른 검색</h3>
+                        <p data-i18n="feature4_desc">앨범 아트 이미지 검색과 유튜브 링크 바로가기 기능</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ Section -->
+            <section id="faq" class="section">
+                <h2 class="section-title" data-i18n="faq_title">자주 묻는 질문</h2>
+                
+                <div class="faq-item">
+                    <div class="faq-question" data-i18n="faq1_q">Q. 어떤 음악 파일 형식을 지원하나요?</div>
+                    <div class="faq-answer" data-i18n="faq1_a">A. MP3 파일을 지원합니다. 모바일 브라우저에서 다운로드한 MP3 파일을 바로 재생할 수 있습니다.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" data-i18n="faq2_q">Q. 다운로드 폴더에서 음악을 어떻게 가져오나요?</div>
+                    <div class="faq-answer" data-i18n="faq2_a">A. 앱 내에서 다운로드 폴더에 직접 접근할 수 있습니다. 원하는 MP3 파일을 탭하면 즉시 플레이어로 반입됩니다.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" data-i18n="faq3_q">Q. 앨범 아트를 어떻게 변경하나요?</div>
+                    <div class="faq-answer" data-i18n="faq3_a">A. 웹에서 원하는 이미지를 복사한 후, 재생 화면의 앨범 아트를 롱프레스(길게 누르기)하면 붙여넣기 팝업이 나타납니다. '여넣기'를 선택하면 복사한 이미지가 앨범 아트로 적용됩니다.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" data-i18n="faq4_q">Q. 곡 제목이나 아티스트명을 수정할 수 있나요?</div>
+                    <div class="faq-answer" data-i18n="faq4_a">A. 네, 가능합니다. 재생 화면에서 제목이나 아티스트명을 복사-붙여넣기로 간편하게 수정할 수 있습니다.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" data-i18n="faq5_q">Q. 유튜브 연동 기능은 무엇인가요?</div>
+                    <div class="faq-answer" data-i18n="faq5_a">A. 재생 중인 곡을 유튜브에서 바로 검색할 수 있는 링크 기능을 제공합니다. 음악에 대해 더 알고 싶을 때 유용합니다.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" data-i18n="faq6_q">Q. 클라우드 동기화나 스트리밍 기능이 있나요?</div>
+                    <div class="faq-answer" data-i18n="faq6_a">A. EZDN Player는 로컬 파일 재생에 집중한 심플한 플레이어입니다. 클라우드나 스트리밍 기능 대신, 기기에 저장된 음악을 빠르고 편리하게 재생하는 데 최적화되어 있습니다.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" data-i18n="faq7_q">Q. 무료인가요?</div>
+                    <div class="faq-answer" data-i18n="faq7_a">A. 네, EZDN Player는 무료로 제공됩니다. 광고나 인앱 구매 없이 모든 기능을 사용하실 수 있습니다.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" data-i18n="faq8_q">Q. 문제가 있거나 제안하고 싶은 기능이 있어요.</div>
+                    <div class="faq-answer" data-i18n="faq8_a">A. 아래 이메일로 언제든지 문의해주세요. 소중한 피드백을 기다립니다!</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p data-i18n="footer_copyright">&copy; 2025 EZDN Player. All rights reserved.</p>
+            <p class="contact"><span data-i18n="footer_contact">📧 문의:</span> <a href="mailto:metyasoft@gmail.com">metyasoft@gmail.com</a></p>
+            <p style="margin-top: 20px;">
+                <a href="privacy.html" data-i18n="footer_privacy">개인정보처리방침</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Translation data
+        const translations = {
+            ko: {
+                nav_features: '기능',
+                nav_screenshots: '스크린샷',
+                nav_faq: 'FAQ',
+                nav_privacy: '개인정보처리방침',
+                hero_title_1: '불필요한 기능은 빼고<br>음악만 남겼습니다',
+                hero_title_2: 'Nothing Extra. Only Music',
+                hero_subtitle: '심플하지만 강력한 음악 플레이어를 경험하세요',
+                download_btn: 'App Store에서 다운로드',
+                screenshots_title: '앱 둘러보기',
+                screenshot1_title: '깔끔한 인터페이스',
+                screenshot1_desc: '불필요한 기능 없이 음악에만 집중할 수 있는 미니멀 디자인',
+                screenshot2_title: '원터치 반입',
+                screenshot2_desc: '다운로드 폴더에서 바로 음악을 가져오는 혁신적인 기능',
+                screenshot3_title: '자유로운 커스터마이징',
+                screenshot3_desc: '복사한 이미지를 롱프레스로 앨범 아트에 바로 적용',
+                features_title: '핵심 기능',
+                feature1_title: '다운로드 폴더 직접 접근',
+                feature1_desc: '모바일 브라우저에서 다운받은 MP3를 원터치로 즉시 반입',
+                feature2_title: '앨범 커스터마이징',
+                feature2_desc: '복사한 이미지를 롱프레스로 앨범 아트에 간편하게 적용',
+                feature3_title: '메타데이터 편집',
+                feature3_desc: '제목, 아티스트명을 복사-붙여넣기로 빠르게 수정',
+                feature4_title: '빠른 검색',
+                feature4_desc: '앨범 아트 이미지 검색과 유튜브 링크 바로가기 기능',
+                faq_title: '자주 묻는 질문',
+                faq1_q: 'Q. 어떤 음악 파일 형식을 지원하나요?',
+                faq1_a: 'A. MP3 파일을 지원합니다. 모바일 브라우저에서 다운로드한 MP3 파일을 바로 재생할 수 있습니다.',
+                faq2_q: 'Q. 다운로드 폴더에서 음악을 어떻게 가져오나요?',
+                faq2_a: 'A. 앱 내에서 다운로드 폴더에 직접 접근할 수 있습니다. 원하는 MP3 파일을 탭하면 즉시 플레이어로 반입됩니다.',
+                faq3_q: 'Q. 앨범 아트를 어떻게 변경하나요?',
+                faq3_a: 'A. 웹에서 원하는 이미지를 복사한 후, 재생 화면의 앨범 아트를 롱프레스(길게 누르기)하면 붙여넣기 팝업이 나타납니다. \'여넣기\'를 선택하면 복사한 이미지가 앨범 아트로 적용됩니다.',
+                faq4_q: 'Q. 곡 제목이나 아티스트명을 수정할 수 있나요?',
+                faq4_a: 'A. 네, 가능합니다. 재생 화면에서 제목이나 아티스트명을 복사-붙여넣기로 간편하게 수정할 수 있습니다.',
+                faq5_q: 'Q. 유튜브 연동 기능은 무엇인가요?',
+                faq5_a: 'A. 재생 중인 곡을 유튜브에서 바로 검색할 수 있는 링크 기능을 제공합니다. 음악에 대해 더 알고 싶을 때 유용합니다.',
+                faq6_q: 'Q. 클라우드 동기화나 스트리밍 기능이 있나요?',
+                faq6_a: 'A. EZDN Player는 로컬 파일 재생에 집중한 심플한 플레이어입니다. 클라우드나 스트리밍 기능 대신, 기기에 저장된 음악을 빠르고 편리하게 재생하는 데 최적화되어 있습니다.',
+                faq7_q: 'Q. 무료인가요?',
+                faq7_a: 'A. 네, EZDN Player는 무료로 제공됩니다. 광고나 인앱 구매 없이 모든 기능을 사용하실 수 있습니다.',
+                faq8_q: 'Q. 문제가 있거나 제안하고 싶은 기능이 있어요.',
+                faq8_a: 'A. 아래 이메일로 언제든지 문의해주세요. 소중한 피드백을 기다립니다!',
+                footer_copyright: '© 2025 EZDN Player. All rights reserved.',
+                footer_contact: '📧 문의:',
+                footer_privacy: '개인정보처리방침'
+            },
+            en: {
+                nav_features: 'Features',
+                nav_screenshots: 'Screenshots',
+                nav_faq: 'FAQ',
+                nav_privacy: 'Privacy Policy',
+                hero_title_1: 'Stripped down.<br>Just music.',
+                hero_title_2: 'Nothing Extra. Only Music',
+                hero_subtitle: 'Experience a simple yet powerful music player',
+                download_btn: 'Download on App Store',
+                screenshots_title: 'App Overview',
+                screenshot1_title: 'Clean Interface',
+                screenshot1_desc: 'Minimal design focused purely on music without unnecessary features',
+                screenshot2_title: 'One-Tap Import',
+                screenshot2_desc: 'Revolutionary feature to import music directly from Downloads folder',
+                screenshot3_title: 'Free Customization',
+                screenshot3_desc: 'Apply copied images to album art with a simple long press',
+                features_title: 'Key Features',
+                feature1_title: 'Direct Downloads Access',
+                feature1_desc: 'Import MP3s from mobile browser downloads instantly with one tap',
+                feature2_title: 'Album Customization',
+                feature2_desc: 'Easily apply copied images to album art with long press',
+                feature3_title: 'Metadata Editing',
+                feature3_desc: 'Quickly update titles and artist names with copy-paste',
+                feature4_title: 'Quick Search',
+                feature4_desc: 'Built-in album art image search and YouTube link navigation',
+                faq_title: 'Frequently Asked Questions',
+                faq1_q: 'Q. What music file formats are supported?',
+                faq1_a: 'A. MP3 files are supported. You can play MP3 files downloaded from mobile browsers directly.',
+                faq2_q: 'Q. How do I import music from the Downloads folder?',
+                faq2_a: 'A. You can directly access the Downloads folder within the app. Tap any MP3 file to instantly import it to the player.',
+                faq3_q: 'Q. How do I change album art?',
+                faq3_a: 'A. Copy an image from the web, then long press on the album art in the playback screen. A paste popup will appear. Select "Paste" to apply the copied image as album art.',
+                faq4_q: 'Q. Can I edit song titles or artist names?',
+                faq4_a: 'A. Yes, you can. You can easily edit titles and artist names using copy-paste on the playback screen.',
+                faq5_q: 'Q. What is the YouTube integration feature?',
+                faq5_a: 'A. It provides a link feature to search for the currently playing song on YouTube. Useful when you want to learn more about the music.',
+                faq6_q: 'Q. Are there cloud sync or streaming features?',
+                faq6_a: 'A. EZDN Player is a simple player focused on local file playback. Instead of cloud or streaming features, it\'s optimized for fast and convenient playback of music stored on your device.',
+                faq7_q: 'Q. Is it free?',
+                faq7_a: 'A. Yes, EZDN Player is provided free of charge. You can use all features without ads or in-app purchases.',
+                faq8_q: 'Q. I have a problem or want to suggest a feature.',
+                faq8_a: 'A. Feel free to contact us via the email below. We look forward to your valuable feedback!',
+                footer_copyright: '© 2025 EZDN Player. All rights reserved.',
+                footer_contact: '📧 Contact:',
+                footer_privacy: 'Privacy Policy'
+            },
+            ja: {
+                nav_features: '機能',
+                nav_screenshots: 'スクリーンショット',
+                nav_faq: 'FAQ',
+                nav_privacy: 'プライバシーポリシー',
+                hero_title_1: '不要な機能は省いて<br>音楽だけを残しました',
+                hero_title_2: 'Nothing Extra. Only Music',
+                hero_subtitle: 'シンプルでパワフルな音楽プレーヤーを体験してください',
+                download_btn: 'App Storeでダウンロード',
+                screenshots_title: 'アプリ紹介',
+                screenshot1_title: 'クリーンなインターフェース',
+                screenshot1_desc: '不要な機能なし、音楽だけに集中できるミニマルデザイン',
+                screenshot2_title: 'ワンタップインポート',
+                screenshot2_desc: 'ダウンロードフォルダから音楽を直接取り込む革新的な機能',
+                screenshot3_title: '自由なカスタマイズ',
+                screenshot3_desc: 'コピーした画像を長押しでアルバムアートに簡単適用',
+                features_title: '主な機能',
+                feature1_title: 'ダウンロードフォルダへの直接アクセス',
+                feature1_desc: 'モバイルブラウザでダウンロードしたMP3をワンタップで即座にインポート',
+                feature2_title: 'アルバムカスタマイズ',
+                feature2_desc: 'コピーした画像を長押しでアルバムアートに簡単適用',
+                feature3_title: 'メタデータ編集',
+                feature3_desc: 'タイトルやアーティスト名をコピペで素早く編集',
+                feature4_title: 'クイック検索',
+                feature4_desc: 'アルバムアート画像検索とYouTubeリンク機能を搭載',
+                faq_title: 'よくある質問',
+                faq1_q: 'Q. どの音楽ファイル形式に対応していますか？',
+                faq1_a: 'A. MP3ファイルに対応しています。モバイルブラウザでダウンロードしたMP3ファイルを直接再生できます。',
+                faq2_q: 'Q. ダウンロードフォルダから音楽を取り込むにはどうすればいいですか？',
+                faq2_a: 'A. アプリ内でダウンロードフォルダに直接アクセスできます。任意のMP3ファイルをタップすると、即座にプレーヤーにインポートされます。',
+                faq3_q: 'Q. アルバムアートを変更するにはどうすればいいですか？',
+                faq3_a: 'A. ウェブから好きな画像をコピーした後、再生画面のアルバムアートを長押しすると、貼り付けポップアップが表示されます。「貼り付け」を選択すると、コピーした画像がアルバムアートとして適用されます。',
+                faq4_q: 'Q. 曲のタイトルやアーティスト名を編集できますか？',
+                faq4_a: 'A. はい、可能です。再生画面でタイトルやアーティスト名をコピー＆ペーストで簡単に編集できます。',
+                faq5_q: 'Q. YouTube連携機能とは何ですか？',
+                faq5_a: 'A. 再生中の曲をYouTubeで直接検索できるリンク機能を提供します。音楽についてもっと知りたい時に便利です。',
+                faq6_q: 'Q. クラウド同期やストリーミング機能はありますか？',
+                faq6_a: 'A. EZDN Playerはローカルファイル再生に特化したシンプルなプレーヤーです。クラウドやストリーミング機能の代わりに、デバイスに保存された音楽を高速かつ便利に再生することに最適化されています。',
+                faq7_q: 'Q. 無料ですか？',
+                faq7_a: 'A. はい、EZDN Playerは無料で提供されています。広告やアプリ内課金なしですべての機能をご利用いただけます。',
+                faq8_q: 'Q. 問題があったり、機能を提案したいのですが。',
+                faq8_a: 'A. 下記のメールアドレスまでお気軽にお問い合わせください。貴重なフィードバックをお待ちしております！',
+                footer_copyright: '© 2025 EZDN Player. All rights reserved.',
+                footer_contact: '📧 お問い合わせ:',
+                footer_privacy: 'プライバシーポリシー'
+            }
+        };
+
+        // Language menu toggle
+        function toggleLanguageMenu() {
+            const dropdown = document.getElementById('language-dropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const selector = document.querySelector('.language-selector');
+            const dropdown = document.getElementById('language-dropdown');
+            if (!selector.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Change language
+        function changeLanguage(lang) {
+            // Update all translated elements
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.innerHTML = translations[lang][key];
+                }
+            });
+
+            // Update current language button
+            const langLabels = {
+                ko: '🇰🇷 한국어',
+                en: '🇺🇸 English',
+                ja: '🇯🇵 日本語'
+            };
+            document.getElementById('current-lang').textContent = langLabels[lang];
+
+            // Update HTML lang attribute
+            document.documentElement.lang = lang;
+
+            // Update selected option
+            document.querySelectorAll('.language-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+
+            // Close dropdown
+            document.getElementById('language-dropdown').classList.remove('active');
+
+            // Save preference
+            localStorage.setItem('preferred-language', lang);
+        }
+
+        // Load saved language preference on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('preferred-language') || 'ko';
+            if (savedLang !== 'ko') {
+                // Simulate click to change language
+                const langOptions = document.querySelectorAll('.language-option');
+                langOptions.forEach(option => {
+                    if (option.textContent.includes(savedLang === 'en' ? 'English' : '日本語')) {
+                        // Manually trigger language change
+                        document.querySelectorAll('[data-i18n]').forEach(element => {
+                            const key = element.getAttribute('data-i18n');
+                            if (translations[savedLang] && translations[savedLang][key]) {
+                                element.innerHTML = translations[savedLang][key];
+                            }
+                        });
+                        const langLabels = {
+                            ko: '🇰🇷 한국어',
+                            en: '🇺🇸 English',
+                            ja: '🇯🇵 日本語'
+                        };
+                        document.getElementById('current-lang').textContent = langLabels[savedLang];
+                        document.documentElement.lang = savedLang;
+                        document.querySelectorAll('.language-option').forEach(opt => opt.classList.remove('selected'));
+                        option.classList.add('selected');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
